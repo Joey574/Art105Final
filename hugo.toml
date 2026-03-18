@@ -1,0 +1,11 @@
+baseURL = 'https://localhost/'
+languageCode = 'en-us'
+title = 'Costs of Disagreement - An Exhibition'
+
+[params]
+  exhibitionName = "Costs of Disagreement"
+  exhibitionSubtitle = "An honest look at the cost of war"
+  exhibitionDescription = "Description"
+  exhibitionVenue = "JoeySoroka"
+  exhibitionData = "All the time"
+  curatorNote = "Curated by Joey Soroka"

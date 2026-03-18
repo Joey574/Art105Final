@@ -1,0 +1,213 @@
+{{ define "main" }}
+
+{{/* ─── Collect artworks sorted by weight ─── */}}
+{{ $artworks := where .Site.RegularPages "Section" "artworks" }}
+{{ $artworks = sort $artworks "Params.weight" }}
+
+<div class="site-wrapper">
+
+  <!-- ░░ HEADER ░░ -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-meta">
+        <span class="header-venue">{{ .Site.Params.exhibitionVenue }}</span>
+        <span class="header-sep">·</span>
+        <span class="header-dates">{{ .Site.Params.exhibitionDates }}</span>
+      </div>
+      <h1 class="header-title">{{ .Site.Params.exhibitionName }}</h1>
+      <p class="header-subtitle">{{ .Site.Params.exhibitionSubtitle }}</p>
+    </div>
+  </header>
+
+  <!-- ░░ EXHIBITION INTRO ░░ -->
+  <section class="exhibition-intro" id="intro">
+    <div class="intro-inner">
+      <p class="intro-body">{{ .Site.Params.exhibitionDescription }}</p>
+      <p class="intro-curator">{{ .Site.Params.curatorNote }}</p>
+      <button class="btn-enter" id="btnEnterGallery" aria-label="Enter gallery">
+        <span>Enter Exhibition</span>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <path d="M3 9h12M10 4l5 5-5 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ░░ GALLERY STAGE ░░ -->
+  <section class="gallery-stage" id="galleryStage" aria-label="Gallery" hidden>
+
+    <!-- Progress bar -->
+    <div class="progress-track" aria-hidden="true">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <!-- Counter -->
+    <div class="gallery-counter" aria-live="polite">
+      <span id="currentIndex">1</span>
+      <span class="counter-sep">/</span>
+      <span>{{ len $artworks }}</span>
+    </div>
+
+    <!-- Slides -->
+    <div class="slides-container" id="slidesContainer">
+      {{ range $i, $art := $artworks }}
+      <article
+        class="artwork-slide{{ if eq $i 0 }} is-active{{ end }}"
+        data-index="{{ $i }}"
+        aria-hidden="{{ if eq $i 0 }}false{{ else }}true{{ end }}"
+      >
+        <div class="slide-inner">
+
+          <!-- Image panel -->
+          <div class="slide-image-panel">
+            <div class="slide-image-frame">
+              <img
+                src="{{ $art.Params.image }}"
+                alt="{{ $art.Params.imageAlt }}"
+                loading="{{ if eq $i 0 }}eager{{ else }}lazy{{ end }}"
+              />
+            </div>
+          </div>
+
+          <!-- Info panel -->
+          <div class="slide-info-panel">
+            <div class="slide-info-inner">
+              <p class="artwork-artist">{{ $art.Params.artist }}</p>
+              <h2 class="artwork-title">{{ $art.Title }}</h2>
+              <dl class="artwork-meta">
+                <div class="meta-row">
+                  <dt>Medium</dt>
+                  <dd>{{ $art.Params.medium }}</dd>
+                </div>
+                <div class="meta-row">
+                  <dt>Year</dt>
+                  <dd>{{ $art.Params.year }}</dd>
+                </div>
+                {{ with $art.Params.dimensions }}
+                <div class="meta-row">
+                  <dt>Dimensions</dt>
+                  <dd>{{ . }}</dd>
+                </div>
+                {{ end }}
+              </dl>
+              <div class="artwork-description">
+                {{ $art.Content }}
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /.slide-inner -->
+      </article>
+      {{ end }}
+    </div><!-- /.slides-container -->
+
+    <!-- Navigation -->
+    <nav class="gallery-nav" aria-label="Navigate artworks">
+      <button class="nav-btn nav-prev" id="btnPrev" aria-label="Previous artwork" disabled>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M15 4l-8 8 8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Prev</span>
+      </button>
+
+      <!-- Dot indicators -->
+      <ol class="dot-track" aria-label="Artwork indicators">
+        {{ range $i, $art := $artworks }}
+        <li>
+          <button
+            class="dot{{ if eq $i 0 }} is-active{{ end }}"
+            data-goto="{{ $i }}"
+            aria-label="Go to artwork {{ add $i 1 }}: {{ $art.Title }}"
+            {{ if eq $i 0 }}aria-current="true"{{ end }}
+          ></button>
+        </li>
+        {{ end }}
+      </ol>
+
+      <button class="nav-btn nav-next" id="btnNext" aria-label="Next artwork">
+        <span>Next</span>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M9 4l8 8-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </nav>
+
+  </section><!-- /.gallery-stage -->
+
+  <!-- ░░ FOOTER ░░ -->
+  <footer class="site-footer">
+    <p>© {{ now.Year }} {{ .Site.Params.exhibitionVenue }} · All rights reserved</p>
+  </footer>
+
+</div><!-- /.site-wrapper -->
+{{ end }}
+
+
+{{ define "scripts" }}
+<script>
+(function () {
+  'use strict';
+
+  const total        = {{ len (where .Site.RegularPages "Section" "artworks") }};
+  const btnEnter     = document.getElementById('btnEnterGallery');
+  const intro        = document.getElementById('intro');
+  const stage        = document.getElementById('galleryStage');
+  const slides       = Array.from(document.querySelectorAll('.artwork-slide'));
+  const dots         = Array.from(document.querySelectorAll('.dot'));
+  const btnPrev      = document.getElementById('btnPrev');
+  const btnNext      = document.getElementById('btnNext');
+  const counterEl    = document.getElementById('currentIndex');
+  const progressFill = document.getElementById('progressFill');
+
+  let current = 0;
+
+  /* ── Show gallery ── */
+  btnEnter.addEventListener('click', () => {
+    intro.classList.add('is-hidden');
+    stage.removeAttribute('hidden');
+    stage.classList.add('is-visible');
+  });
+
+  /* ── Go to slide ── */
+  function goTo(index) {
+    slides[current].classList.remove('is-active');
+    slides[current].setAttribute('aria-hidden', 'true');
+    dots[current].classList.remove('is-active');
+    dots[current].removeAttribute('aria-current');
+
+    current = (index + total) % total;
+
+    slides[current].classList.add('is-active');
+    slides[current].setAttribute('aria-hidden', 'false');
+    dots[current].classList.add('is-active');
+    dots[current].setAttribute('aria-current', 'true');
+
+    counterEl.textContent = current + 1;
+    progressFill.style.width = ((current + 1) / total * 100) + '%';
+
+    btnPrev.disabled = (current === 0);
+    btnNext.disabled = (current === total - 1);
+  }
+
+  /* ── Buttons ── */
+  btnPrev.addEventListener('click', () => goTo(current - 1));
+  btnNext.addEventListener('click', () => goTo(current + 1));
+
+  /* ── Dot indicators ── */
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => goTo(i));
+  });
+
+  /* ── Keyboard navigation ── */
+  document.addEventListener('keydown', (e) => {
+    if (!stage.classList.contains('is-visible')) return;
+    if (e.key === 'ArrowLeft')  goTo(current - 1);
+    if (e.key === 'ArrowRight') goTo(current + 1);
+  });
+
+  /* ── Init progress ── */
+  progressFill.style.width = (1 / total * 100) + '%';
+
+}());
+</script>
+{{ end }}
