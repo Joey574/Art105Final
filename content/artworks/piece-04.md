@@ -1,12 +1,12 @@
 ---
-title: "TBD-Title"
-artist: "TBD-Artist"
-medium: "TBD-Medium"
-year: "TBD-Year"
-dimensions: "TBD-Dimensions"
+title: "The Vulture and the Little Girl"
+artist: "Kevin Carter"
+medium: "Photo"
+year: "1993"
+dimensions: "N/A"
 weight: 4
 image: "/images/piece-04.jpg"
-imageAlt: "TBD-Imagealt"
+imageAlt: "The Vulture and the Little Girl by Kevin Carter"
 ---
 
 TBD-Description
