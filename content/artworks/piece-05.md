@@ -4,7 +4,7 @@ artist: "John Singer Sargent"
 medium: "Oil on Canvas"
 year: "1919"
 dimensions: "231 x 611 cm (91 x 240 ½ in)"
-weight: 5
+weight: 4
 image: "/images/piece-05.jpg"
 imageAlt: "Gassed by John Singer Sargent"
 ---

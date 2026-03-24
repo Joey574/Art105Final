@@ -4,7 +4,7 @@ artist: "C.R.W Nevinson"
 medium: "Oil painting"
 year: "1917"
 dimensions: "46 x 61 cm (18 x 24 in)"
-weight: 2
+weight: 3
 image: "/images/piece-02.jpg"
 imageAlt: "Paths of Glory by C.R.W Nevinson"
 ---

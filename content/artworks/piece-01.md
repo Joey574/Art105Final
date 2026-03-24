@@ -4,7 +4,7 @@ artist: "Vasily Vereshchagin"
 medium: "Oil on Canvas"
 year: "1871"
 dimensions: "127 x 197 cm (50 x 78 in)"
-weight: 1
+weight: 2
 image: "/images/piece-01.jpg"
 imageAlt: "The Apotheosis of War by Vasily Vereshchagin"
 ---

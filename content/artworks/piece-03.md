@@ -4,7 +4,7 @@ artist: "Peter Paul Rubens"
 medium: "Oil on Canvas"
 year: "1638-39"
 dimensions: "206 x 345 cm (81 x 136 in)"
-weight: 3
+weight: 1
 image: "/images/piece-03.jpg"
 imageAlt: "Consequences of War by Peter Paul Rubens"
 ---
